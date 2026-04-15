@@ -86,6 +86,13 @@ class _SpyreImpl:
         fn = getattr(self._C, "manual_seed", None)
         if fn:
             fn(int(seed), -1 if device is None else int(device))
+    
+    def synchronize(self, device=None) -> None:
+        """Blocks until all pending Spyre device operations are complete. Must be called before reading profiling results to ensure accurate timing."""
+        self._lazy_init()
+
+        from torch_spyre.streams import synchronize as _synchronize
+        _synchronize(device)
 
     def manual_seed_all(self, seed: int) -> None:
         _C = self._C
@@ -141,7 +148,19 @@ def make_spyre_module() -> types.ModuleType:
     mod.device_count = lambda: impl.device_count()
     mod.current_device = lambda: impl.current_device()
     mod.set_device = lambda idx: impl.set_device(idx)
+    mod.synchronize = impl.synchronize
     mod._is_compiled = lambda: True
+    mod.__all__ = [
+        "is_available",
+        "is_initialized",
+        "device_count",
+        "current_device",
+        "set_device",
+        "manual_seed",
+        "manual_seed_all",
+        "synchronize",
+    ]
+
 
     # Optional: forward unknown attrs to the impl or _C for convenience
     def __getattr__(name):
