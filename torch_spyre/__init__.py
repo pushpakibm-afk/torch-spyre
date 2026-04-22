@@ -91,10 +91,11 @@ class _SpyreImpl:
     def _is_in_bad_fork(self) -> bool:
         return self._in_bad_fork
 
-    def synchronize(self,device=None):
+    def synchronize(self, device=None):
         self._lazy_init()
 
-        from torch_spyre.streams import synchronize as _synchronize 
+        from torch_spyre.streams import synchronize as _synchronize
+
         _synchronize(device)
 
     def manual_seed(self, seed: int, device: int | None = None) -> None:
