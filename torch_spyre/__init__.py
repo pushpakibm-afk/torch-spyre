@@ -91,6 +91,12 @@ class _SpyreImpl:
     def _is_in_bad_fork(self) -> bool:
         return self._in_bad_fork
 
+    def synchronize(self,device=None):
+        self._lazy_init()
+
+        from torch_spyre.streams import synchronize as _synchronize 
+        _synchronize(device)
+
     def manual_seed(self, seed: int, device: int | None = None) -> None:
         fn = getattr(self._C, "manual_seed", None)
         if fn:
@@ -153,6 +159,7 @@ def make_spyre_module() -> types.ModuleType:
     mod.current_device = lambda: impl.current_device()
     mod.set_device = lambda idx: impl.set_device(idx)
     mod._is_compiled = lambda: True
+    mod.synchronize = impl.synchronize
     mod.memory = memory
 
     # Optional: forward unknown attrs to the impl or _C for convenience
